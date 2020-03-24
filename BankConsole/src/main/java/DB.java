@@ -1,5 +1,7 @@
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.UUID;
 
 
 public class DB {
@@ -61,6 +63,20 @@ public class DB {
         return userList;
     }
 
+    public static ArrayList<Account> getUserAccs(int id) throws ClassNotFoundException, SQLException {
+        PreparedStatement statement = conn.prepareStatement("select * from account where client_id = ?");
+        statement.setInt(1, id);
+        ResultSet rst = statement.executeQuery();
+        ArrayList<Account> accs = new ArrayList<>();
+        while(rst.next()) {
+           accs.add(new Account(UUID.fromString(rst.getString("uuid")),
+                   rst.getInt("client_id"),
+                   rst.getBigDecimal("amount"),
+                   rst.getString("accCode")));
+        }
+        return accs;
+    }
+
     public static User getUser(String login) throws ClassNotFoundException, SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from user where login = ?");
         statement.setString(1, login);
@@ -75,5 +91,39 @@ public class DB {
         else {
             return null;
         }
+    }
+
+    public void insertAccount(Account account) throws SQLException {
+        String sql = "INSERT INTO account(uuid, client_id, amount, accCode) VALUES(?,?,?,?)";
+
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, account.getUuid().toString());
+        pstmt.setInt(2, account.getClientId());
+        pstmt.setBigDecimal(3, account.getAmount());
+        pstmt.setString(4, account.getAccCode());
+        pstmt.executeUpdate();
+    }
+
+    public static Account getAccount(UUID uuid) throws ClassNotFoundException, SQLException {
+        PreparedStatement statement = conn.prepareStatement("select * from account where uuid = ?");
+        statement.setString(1, uuid.toString());
+        ResultSet rst = statement.executeQuery();
+        if(rst.next()) {
+            return new Account(UUID.fromString(rst.getString("uuid")),
+                    rst.getInt("client_id"),
+                    rst.getBigDecimal("amount"),
+                    rst.getString("accCode"));
+        }
+        else {
+            return null;
+        }
+    }
+
+    public void updateAccount(UUID uuid, BigDecimal sum) throws SQLException {
+        String sql = "UPDATE account SET amount = ? WHERE uuid = ? ";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setBigDecimal(1, sum);
+        pstmt.setString(2, uuid.toString());
+        pstmt.executeUpdate();
     }
 }
