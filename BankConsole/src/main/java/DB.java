@@ -77,9 +77,25 @@ public class DB {
         return accs;
     }
 
-    public static User getUser(String login) throws ClassNotFoundException, SQLException {
+    public static User getUserByLogin(String login) throws ClassNotFoundException, SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from user where login = ?");
         statement.setString(1, login);
+        ResultSet rst = statement.executeQuery();
+        if(rst.next()) {
+            return new User(rst.getInt("id"),
+                    rst.getString("login"),
+                    rst.getString("password"),
+                    rst.getString("address"),
+                    rst.getString("phone"));
+        }
+        else {
+            return null;
+        }
+    }
+
+    public static User getUserByPhone(String phone) throws ClassNotFoundException, SQLException {
+        PreparedStatement statement = conn.prepareStatement("select * from user where phone = ?");
+        statement.setString(1, phone);
         ResultSet rst = statement.executeQuery();
         if(rst.next()) {
             return new User(rst.getInt("id"),
