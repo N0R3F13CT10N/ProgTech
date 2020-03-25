@@ -1,8 +1,10 @@
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 
 public class Main {
     private static DB db = new DB();
@@ -10,7 +12,7 @@ public class Main {
     private static Scanner in = new Scanner(System.in);
     private static User currentUser;
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+    public static void main(String[] args) throws SQLException, ClassNotFoundException, ParseException {
         DB.Init();
         boolean quit = false;
         while (!quit) {
@@ -87,9 +89,9 @@ public class Main {
         }
     }
 
-    public static void secondMenu() throws SQLException, ClassNotFoundException {
+    public static void secondMenu() throws SQLException, ParseException {
         boolean quit = false;
-        ArrayList<String> currencyTypes = new ArrayList<String>();
+        ArrayList<String> currencyTypes = new ArrayList<>();
         currencyTypes.add("RUB");
         currencyTypes.add("EUR");
         currencyTypes.add("USD");
@@ -140,11 +142,18 @@ public class Main {
                             System.out.println("Choose currency:\n1 - RUB\n2 - EUR\n3 - USD");
                             String curr = currencyTypes.get(in.nextInt() - 1) + "_TO_" + acc.getAccCode();
                             System.out.println("Input sum:");
-                            BigDecimal newSum = acc.getAmount().add(new BigDecimal(in.next()).
-                                    multiply(new BigDecimal(convert.get(curr).toString())));
+                            BigDecimal oldSum = acc.getAmount();
+                            BigDecimal sum = new BigDecimal(in.next()).
+                                    multiply(new BigDecimal(convert.get(curr).toString()));
+                            BigDecimal newSum = acc.getAmount().add(sum);
                             db.updateAccount(acc.getUuid(), newSum);
                             System.out.println("Now you have " + newSum +
                                     " " + acc.getAccCode() + " on your account!");
+                            db.insertOp(new Operation(
+                                    new Date(),
+                                    acc.getAccCode(),
+                                    null, acc.getUuid(), sum, oldSum, newSum));
+
                         } catch (Exception exception) {
                             System.out.println("Incorrect input!");
                         }
@@ -159,14 +168,11 @@ public class Main {
                             User to = DB.getUserByPhone(in.next());
                             if (to == null) {
                                 System.out.println("No users found!");
-                            }
-                            else if (to == currentUser) {
+                            } else if (to == currentUser) {
                                 System.out.println("You can't transfer money to yourself!");
-                            }
-                            else if(DB.getUserAccs(to.getId()).size() == 0){
+                            } else if (DB.getUserAccs(to.getId()).size() == 0) {
                                 System.out.println("User has no accounts!");
-                            }
-                            else {
+                            } else {
                                 System.out.println("Choose your account:");
                                 for (int i = 1; i <= accs.size(); i++) {
                                     Account x = accs.get(i - 1);
@@ -192,11 +198,16 @@ public class Main {
                                     System.out.println("You don't have enough money!");
                                 } else {
                                     BigDecimal newSumFrom = acc_from.getAmount().subtract(sum);
-                                    BigDecimal newSumTo = acc_to.getAmount().add(sum);
+                                    BigDecimal oldSumTo = acc_to.getAmount();
+                                    BigDecimal newSumTo = oldSumTo.add(sum);
                                     db.updateAccount(acc_from.getUuid(), newSumFrom);
                                     db.updateAccount(acc_to.getUuid(), newSumTo);
                                     System.out.println("Now you have " + newSumFrom +
                                             " " + acc_from.getAccCode() + " on your account!");
+                                    db.insertOp(new Operation(
+                                            new Date(),
+                                            acc_from.getAccCode(),
+                                            acc_from.getUuid(), acc_to.getUuid(), sum, oldSumTo, newSumTo));
                                 }
                             }
                         } catch (Exception exception) {
@@ -205,6 +216,21 @@ public class Main {
                     }
                     break;
                 case "4":
+                    System.out.println("Last 20 operations on your accounts:");
+                    ArrayList<Operation> ops = db.getOps(currentUser.getId());
+                    Collections.sort(ops);
+                    for(Operation op: ops){
+                        if(op.getAccFrom() == null){
+                            System.out.println(op.getDate() + " : " +
+                                    op.getSum() + " " + op.getAccCode() +
+                                    " deposited to " + op.getAccTo());
+                        }
+                        else {
+                            System.out.println(op.getDate() + " : " +
+                                    op.getSum() + " " + op.getAccCode() +
+                                    " transfered to " + op.getAccTo() + " from " + op.getAccFrom());
+                        }
+                    }
                     break;
                 case "q":
                     quit = true;

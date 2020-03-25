@@ -2,7 +2,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
-public class Operation {
+public class Operation implements Comparable<Operation>{
     private Integer id;
     private Date date;
     private String accCode;
@@ -11,14 +11,6 @@ public class Operation {
     private BigDecimal sum;
     private BigDecimal sumBefore;
     private BigDecimal sumAfter;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public Operation(Integer id, Date date, String accCode, UUID accFrom, UUID accTo, BigDecimal sum, BigDecimal sumBefore, BigDecimal sumAfter) {
         this.id = id;
@@ -95,5 +87,10 @@ public class Operation {
         this.sum = sum;
         this.sumBefore = sumBefore;
         this.sumAfter = sumAfter;
+    }
+
+    @Override
+    public int compareTo(Operation o) {
+        return getDate().compareTo(o.getDate());
     }
 }

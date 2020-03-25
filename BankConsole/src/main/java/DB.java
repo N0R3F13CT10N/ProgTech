@@ -1,13 +1,15 @@
 import java.math.BigDecimal;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.UUID;
 
 
 public class DB {
     public static Connection conn;
     public static Statement statmt;
-    public static ResultSet resSet;
 
 
     public static void Init() throws ClassNotFoundException, SQLException {
@@ -22,9 +24,9 @@ public class DB {
                 "'amount' DECIMAL DEFAULT 0.0, 'accCode' text," +
                 "FOREIGN KEY(client_id) REFERENCES User(id));");
         statmt.execute("CREATE TABLE if not exists 'Operation' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "'date' DATE, " +
-                "'accCode' text, 'accFrom' INTEGER," +
-                "'accTo' INTEGER, 'sum' DECIMAL, 'sumBefore' DECIMAL, 'sumAfter' DECIMAL);");
+                "'date' text, " +
+                "'accCode' text, 'accFrom' text," +
+                "'accTo' text, 'sum' DECIMAL, 'sumBefore' DECIMAL, 'sumAfter' DECIMAL);");
         System.out.println("Tables created!");
     }
 
@@ -37,7 +39,7 @@ public class DB {
     }
 
     public void insertUser(User user) throws SQLException {
-        String sql = "INSERT INTO user(login,password, address, phone) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO user(login, password, address, phone) VALUES(?,?,?,?)";
 
         PreparedStatement pstmt = conn.prepareStatement(sql);
         pstmt.setString(1, user.getLogin());
@@ -47,23 +49,7 @@ public class DB {
         pstmt.executeUpdate();
     }
 
-    public static ArrayList<User> getAllUsers() throws ClassNotFoundException, SQLException {
-        Statement stm;
-        stm = conn.createStatement();
-        ResultSet rst = stm.executeQuery("Select * From User");
-        ArrayList<User> userList = new ArrayList<User>();
-        while (rst.next()) {
-            User user = new User(rst.getInt("id"),
-                    rst.getString("login"),
-                    rst.getString("password"),
-                    rst.getString("address"),
-                    rst.getString("phone"));
-            userList.add(user);
-        }
-        return userList;
-    }
-
-    public static ArrayList<Account> getUserAccs(int id) throws ClassNotFoundException, SQLException {
+    public static ArrayList<Account> getUserAccs(int id) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from account where client_id = ?");
         statement.setInt(1, id);
         ResultSet rst = statement.executeQuery();
@@ -77,7 +63,7 @@ public class DB {
         return accs;
     }
 
-    public static User getUserByLogin(String login) throws ClassNotFoundException, SQLException {
+    public static User getUserByLogin(String login) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from user where login = ?");
         statement.setString(1, login);
         ResultSet rst = statement.executeQuery();
@@ -93,7 +79,7 @@ public class DB {
         }
     }
 
-    public static User getUserByPhone(String phone) throws ClassNotFoundException, SQLException {
+    public static User getUserByPhone(String phone) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from user where phone = ?");
         statement.setString(1, phone);
         ResultSet rst = statement.executeQuery();
@@ -120,7 +106,7 @@ public class DB {
         pstmt.executeUpdate();
     }
 
-    public static Account getAccount(UUID uuid) throws ClassNotFoundException, SQLException {
+    public static Account getAccount(UUID uuid) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("select * from account where uuid = ?");
         statement.setString(1, uuid.toString());
         ResultSet rst = statement.executeQuery();
@@ -141,5 +127,53 @@ public class DB {
         pstmt.setBigDecimal(1, sum);
         pstmt.setString(2, uuid.toString());
         pstmt.executeUpdate();
+    }
+
+    public void insertOp(Operation op) throws SQLException {
+        String sql = "INSERT INTO operation(date, accCode, accFrom, accTo, sum, sumBefore, sumAfter) VALUES(?,?,?,?,?,?,?)";
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, op.getDate().toString());
+        pstmt.setString(2, op.getAccCode());
+        if(op.getAccFrom() == null){
+            pstmt.setNull(3, Types.VARCHAR);
+        }
+        else{
+            pstmt.setString(3, op.getAccFrom().toString());
+        }
+        pstmt.setString(4, op.getAccTo().toString());
+        pstmt.setBigDecimal(5, op.getSum());
+        pstmt.setBigDecimal(6, op.getSumBefore());
+        pstmt.setBigDecimal(7, op.getSumAfter());
+        pstmt.executeUpdate();
+    }
+
+
+    public ArrayList<Operation> getOps(int id) throws SQLException, ParseException {
+        PreparedStatement statement = conn.prepareStatement("select " +
+                " Operation.id, Operation.date, Operation.accCode," +
+                " Operation.accFrom, Operation.accTo, Operation.sum from operation" +
+                " inner join Account ON Account.client_id = ?" +
+                " where operation.accFrom = account.uuid OR operation.accTo= account.uuid" +
+                " limit 3");
+        statement.setInt(1, id);
+        ResultSet rst = statement.executeQuery();
+        ArrayList<Operation> ops = new ArrayList<>();
+        while(rst.next()) {
+            String temp = rst.getString("accFrom");
+            UUID from;
+            if(temp == null)
+                from = null;
+            else{
+                from = UUID.fromString(temp);
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+            ops.add(new Operation(rst.getInt("id"),
+                    simpleDateFormat.parse(rst.getString("date")),
+                    rst.getString("accCode"),
+                    from,
+                    UUID.fromString(rst.getString("accTo")),
+                    new BigDecimal(rst.getString("sum")), null, null));
+        }
+        return ops;
     }
 }
