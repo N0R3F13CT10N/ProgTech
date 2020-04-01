@@ -5,10 +5,16 @@ C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\ja
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Entity\User.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\BankSpringApplication.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Repository\UserRepository.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Entity\Operation.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Entity\Account.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Controller\DepositController.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Config\SQLiteDialect.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Service\SecurityService.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Controller\AddAccountController.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Service\UserService.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Config\MVCConfig.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Service\UserValidator.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Controller\UserController.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Repository\AccountRepository.java
 C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Controller\RegistrationController.java
+C:\Users\Rinat Tyapaev\IdeaProjects\Java projects\4 grade\bankSpring\src\main\java\com\example\bankSpring\Controller\HomeController.java

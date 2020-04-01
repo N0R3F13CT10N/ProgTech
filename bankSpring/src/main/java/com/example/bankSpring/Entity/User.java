@@ -1,6 +1,7 @@
 package com.example.bankSpring.Entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 
 @Entity
@@ -23,6 +24,17 @@ public class User {
 
     @Column(name = "phone", nullable = false)
     private String phone;
+
+    @OneToMany(mappedBy="user")
+    private Set<Account> accounts;
+
+    public Set<Account> getAccounts() {
+        return accounts;
+    }
+
+    public void setAccounts(Set<Account> accounts) {
+        this.accounts = accounts;
+    }
 
     @Transient
     private String passwordConfirm;

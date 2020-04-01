@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Transfer</title>
+</head>
+<body>
+<h1>Transfer</h1>
+<form method="post">
+    <div>
+        <label> Phone number of receiver: <input type="text" name="phone"/> </label>
+    </div>
+    <div>
+        <label> Account: </label>
+        <select name="uuid">
+            <option th:each="account : ${accounts}" th:value="${account.uuid}" th:utext="${account}">
+            </option>
+        </select>
+    </div>
+    <div><label> Amount: <input type="text" name="sum"/> </label></div>
+    <div>
+        <label> Currency: </label>
+        <select name="currency">
+            <option>RUB</option>
+            <option>USD</option>
+            <option>EUR</option>
+        </select>
+    </div>
+    <div><input type="submit" value="Transfer"/></div>
+</form>
+<a href="/home">Back</a>
+</body>
+</html>
