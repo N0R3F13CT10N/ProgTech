@@ -33,7 +33,7 @@ public class AddAccountController {
     }
 
     @PostMapping("/newacc")
-    public String newacc(@ModelAttribute("accForm") @Valid Account accForm, BindingResult bindingResult) {
+    public String newacc(@ModelAttribute("accForm") Account accForm, BindingResult bindingResult) {
         accForm.setUuid(UUID.randomUUID());
         accForm.setAmount(BigDecimal.valueOf(0));
         User user = userService.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());

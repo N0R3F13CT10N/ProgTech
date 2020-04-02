@@ -30,16 +30,17 @@ public class RegistrationController {
     @GetMapping("/registration")
     public String registration(Model model, String error) {
         if (error != null)
-            model.addAttribute("error", "Incorrect data!");
+            model.addAttribute("message", "Incorrect data!");
         model.addAttribute("userForm", new User());
         return "registration";
     }
 
     @PostMapping("/registration")
-    public String registration(@ModelAttribute("userForm") @Valid User userForm, BindingResult bindingResult) {
+    public String registration(@ModelAttribute("userForm") @Valid User userForm, BindingResult bindingResult, Model model) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
+            model.addAttribute("message", "Incorrect data!");
             return "registration";
         }
 

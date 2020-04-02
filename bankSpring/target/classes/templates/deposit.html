@@ -13,7 +13,9 @@
             </option>
         </select>
     </div>
-    <div><label> Amount: <input type="text" name="sum"/> </label></div>
+    <div><label> Amount: <input type="text" name="sum"/> </label>
+        <label th:if="${message}" th:text="${message}"></label>
+    </div>
     <div>
         <label> Currency: </label>
         <select name="currency">

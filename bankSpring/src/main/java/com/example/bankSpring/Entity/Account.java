@@ -91,7 +91,7 @@ public class Account {
     public String toString() {
         return String.format(
                 "%s %s",
-                amount.toString(), accCode);
+                uuid.toString(), accCode);
     }
 
     public void withdraw(Double sum, String currency){

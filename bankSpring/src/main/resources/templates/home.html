@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Bank App</title>
 </head>
 <body>
     <h1>Welcome, [[${user.username}]]!</h1>
+    <div th:if="${message}" th:text="${message}"></div>
     <div><a href="/newacc">Create account</a></div>
     <div><a href="/deposit">Deposit</a></div>
     <div><a href="/transfer">Transfer</a></div>
+    <div><a href="/history">Check history</a></div>
     <div><a href="/logout">Logout</a></div>
 </body>
 </html>

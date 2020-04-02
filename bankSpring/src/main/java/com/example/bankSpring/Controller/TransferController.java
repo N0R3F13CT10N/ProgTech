@@ -15,6 +15,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
@@ -30,24 +32,54 @@ public class TransferController {
     private UserService userService;
 
     @GetMapping("/transfer")
-    public String transfer(Model model) {
+    public String transfer(Model model, RedirectAttributes redirectAttributes) {
         User user = userService.findByLogin(SecurityContextHolder.getContext().getAuthentication().getName());
         model.addAttribute("accounts", user.getAccounts());
-        if(user.getAccounts().size() == 0)
+        if(user.getAccounts().size() == 0) {
+            redirectAttributes.addFlashAttribute("message", "You have no accounts!");
             return "redirect:/home";
+        }
         return "transfer";
     }
 
     @PostMapping("/transfer")
     public String transfer(@ModelAttribute("phone") String phone,
                            @ModelAttribute("uuid") String account,
-                           @ModelAttribute("sum") Double sum,
+                           @ModelAttribute("sum") String sumStr,
                            @ModelAttribute("currency") String currency,
-                           BindingResult bindingResult) {
+                           BindingResult bindingResult,
+                           RedirectAttributes redirectAttributes) {
         Optional<Account> accEntity = accountRepository.findById(UUID.fromString(account));
         Account accFrom = accEntity.get();
         User receiver = userService.findByPhone(phone);
-        Account accTo = receiver.getAccounts().iterator().next();
+        if(receiver == null){
+            redirectAttributes.addFlashAttribute("phone_message", "Invalid phone!");
+            return "redirect:/transfer";
+        }
+        Account accTo;
+        try {
+            accTo = receiver.getAccounts().iterator().next();
+        }
+        catch(Exception ex){
+            redirectAttributes.addFlashAttribute("phone_message", "This user has no accounts!");
+            return "redirect:/transfer";
+        }
+        double sum;
+        try{
+            sum = Double.parseDouble(sumStr);
+        }
+        catch (Exception e){
+            redirectAttributes.addFlashAttribute("message", "Incorrect data!");
+            return "redirect:/transfer";
+        }
+        if(sum <= 0){
+            redirectAttributes.addFlashAttribute("message", "Amount must be greater than 0!");
+            return "redirect:/transfer";
+        }
+        if(BigDecimal.valueOf(sum).compareTo(Converter.convert(accFrom.getAmount(), accFrom.getAccCode(), currency)) > 0){
+            redirectAttributes.addFlashAttribute("message", "U don't have enough money!");
+            return "redirect:/transfer";
+        }
         BigDecimal oldSum = accTo.getAmount();
         accFrom.withdraw(sum, currency);
         accTo.deposit(sum, currency);

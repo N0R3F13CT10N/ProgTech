@@ -8,6 +8,7 @@
 <form method="post">
     <div>
         <label> Phone number of receiver: <input type="text" name="phone"/> </label>
+        <label th:if="${phone_message}" th:text="${phone_message}"></label>
     </div>
     <div>
         <label> Account: </label>
@@ -16,7 +17,9 @@
             </option>
         </select>
     </div>
-    <div><label> Amount: <input type="text" name="sum"/> </label></div>
+    <div><label> Amount: <input type="text" name="sum"/> </label>
+        <label th:if="${message}" th:text="${message}"></label>
+    </div>
     <div>
         <label> Currency: </label>
         <select name="currency">

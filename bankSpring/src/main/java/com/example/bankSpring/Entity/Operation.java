@@ -2,8 +2,11 @@ package com.example.bankSpring.Entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
+import java.text.SimpleDateFormat;
 
 @Entity
 @Table(name = "operation")
@@ -15,7 +18,7 @@ public class Operation implements Comparable<Operation> {
     private Integer id;
 
     @Column(name = "date", nullable = false)
-    private Date date;
+    private String date;
 
     @Column(name = "accCode", nullable = false)
     private String accCode;
@@ -31,8 +34,28 @@ public class Operation implements Comparable<Operation> {
     @Column(name = "sum", nullable = false)
     private BigDecimal sum;
 
+    @Column(name = "sumBefore", nullable = false)
+    private BigDecimal sumBefore;
+
+    @Column(name = "sumAfter", nullable = false)
+    private BigDecimal sumAfter;
+
+    public Operation() {
+    }
+
+    public Operation(Integer id, Date date, String accCode, Account accFrom, Account accTo, BigDecimal sum, BigDecimal sumBefore, BigDecimal sumAfter) {
+        this.id = id;
+        this.date = date.toString();
+        this.accCode = accCode;
+        this.accFrom = accFrom;
+        this.accTo = accTo;
+        this.sum = sum;
+        this.sumBefore = sumBefore;
+        this.sumAfter = sumAfter;
+    }
+
     public Operation(Date date, String accCode, Account accTo, BigDecimal sum, BigDecimal sumBefore, BigDecimal sumAfter) {
-        this.date = date;
+        this.date = date.toString();
         this.accCode = accCode;
         this.accTo = accTo;
         this.sum = sum;
@@ -41,7 +64,7 @@ public class Operation implements Comparable<Operation> {
     }
 
     public Operation(Date date, String accCode, Account accFrom, Account accTo, BigDecimal sum, BigDecimal sumBefore, BigDecimal sumAfter) {
-        this.date = date;
+        this.date = date.toString();
         this.accCode = accCode;
         this.accFrom = accFrom;
         this.accTo = accTo;
@@ -58,12 +81,13 @@ public class Operation implements Comparable<Operation> {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDate() throws ParseException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        return  simpleDateFormat.parse(date);
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        this.date = date.toString();
     }
 
     public String getAccCode() {
@@ -114,14 +138,14 @@ public class Operation implements Comparable<Operation> {
         this.sumAfter = sumAfter;
     }
 
-    private BigDecimal sumBefore;
-
-    private BigDecimal sumAfter;
-
-
 
     @Override
     public int compareTo(Operation o) {
-        return getDate().compareTo(o.getDate());
+        try {
+            return getDate().compareTo(o.getDate());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
