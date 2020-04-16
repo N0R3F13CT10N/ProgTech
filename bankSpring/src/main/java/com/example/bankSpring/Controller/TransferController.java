@@ -51,8 +51,11 @@ public class TransferController {
                            RedirectAttributes redirectAttributes) {
         Optional<Account> accEntity = accountRepository.findById(UUID.fromString(account));
         Account accFrom = accEntity.get();
-        User receiver = userService.findByPhone(phone);
-        if(receiver == null){
+        User receiver;
+        try {
+            receiver = userService.findByPhone(phone);
+        }
+        catch (Exception e){
             redirectAttributes.addFlashAttribute("phone_message", "Invalid phone!");
             return "redirect:/transfer";
         }

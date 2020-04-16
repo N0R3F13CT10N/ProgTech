@@ -27,18 +27,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByLogin(String username) {
         List<User> users = userRepository.findByLogin(username);
-        if(users.size() > 0 )
-            return users.get(0);
-        else
-            return null;
+        return users.get(0);
     }
 
     @Override
     public User findByPhone(String phone) {
         List<User> users = userRepository.findByPhone(phone);
-        if(users.size() > 0 )
-            return users.get(0);
-        else
-            return null;
+        return users.get(0);
     }
 }
